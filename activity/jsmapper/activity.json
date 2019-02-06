@@ -1,0 +1,27 @@
+{
+  "name": "tibco-jsmapper",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "JSONata Mapper Activity",
+  "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
+  "title": "JSON Mapper",
+  "homepage": "https://github.com/yxuco/flogo-components/tree/master/activity/jsmapper",
+  "author": "Yueming Xu <yxu@tibco.com>",
+  "input":[
+    {
+      "name": "source",
+      "type": "any",
+      "required": true
+    },
+    {
+      "name": "mapexpr",
+      "type": "any"
+    }
+  ],
+  "output": [
+    {
+      "name": "value",
+      "type": "any"
+    }
+  ]
+}
