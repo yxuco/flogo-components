@@ -34,7 +34,14 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 
 	// TODO: process either string or JSON data
 	source := context.GetInput(ivSource)
-	log.Info("Input data:", source)
+	switch v := source.(type) {
+	case string:
+		log.Info("Input string data:", v)
+	case map[string]interface{}:
+		log.Infof("Input JSON object %T: %+v", v, v)
+	default:
+		log.Infof("Input other data type %T, %+v", v, v)
+	}
 	mapexpr := context.GetInput(ivMapexpr).(string)
 	log.Info("Mapper expression:", mapexpr)
 
