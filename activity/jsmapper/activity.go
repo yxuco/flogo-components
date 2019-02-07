@@ -62,6 +62,12 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 	default:
 		log.Infof("Context %T: %+v", v, v)
 	}
+	actValue, err := data.GetBasicResolver().Resolve("$activity[app_16].value", wd)
+	if err != nil {
+		log.Errorf("failed to resolve %+v", err)
+	} else {
+		log.Infof("resolved flow data %T: %+v", actValue, actValue)
+	}
 
 	// TODO: transform data here
 	value := source
