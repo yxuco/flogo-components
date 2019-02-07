@@ -47,26 +47,18 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 	log.Info("Mapper expression:", mapexpr)
 
 	actionCtx := context.ActivityHost()
-	log.Infof("ActivitHost %T: %+v", actionCtx, actionCtx)
-	wd := actionCtx.WorkingData()
-	log.Infof("WorkingData %T: %+v", wd, wd)
-
-	switch v := wd.(type) {
-	case *data.FixedScope:
-		log.Infof("FixedScope %T: %+v", v, v)
-	default:
-		log.Infof("working data scope type %T: %+v", v, v)
-	}
-
-	switch v := context.(type) {
-	default:
-		log.Infof("Context %T: %+v", v, v)
-	}
-	actValue, err := context.ActivityHost().GetResolver().Resolve("$activity[app_16].value", context.ActivityHost().WorkingData())
+	actValue, err := actionCtx.GetResolver().Resolve("$activity[app_16].value", actionCtx.WorkingData())
 	if err != nil {
-		log.Errorf("failed to resolve %+v", err)
+		log.Errorf("failed to resolve activity data %+v", err)
 	} else {
-		log.Infof("resolved flow data %T: %+v", actValue, actValue)
+		log.Infof("resolved activity data %T: %+v", actValue, actValue)
+	}
+
+	flowValue, err := actionCtx.GetResolver().Resolve("$flow.content", actionCtx.WorkingData())
+	if err != nil {
+		log.Errorf("failed to resolve flow content %+v", err)
+	} else {
+		log.Infof("resolved flow content %T: %+v", flowValue, flowValue)
 	}
 
 	// TODO: transform data here
