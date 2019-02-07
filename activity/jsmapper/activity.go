@@ -45,6 +45,15 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 	mapexpr := context.GetInput(ivMapexpr).(string)
 	log.Info("Mapper expression:", mapexpr)
 
+	actionCtx := context.ActivityHost()
+	log.Infof("ActivitHost %T: %+v", actionCtx, actionCtx)
+	workingData := actionCtx.WorkingData()
+	log.Infof("WorkingData %T: %+v", workingData, workingData)
+	ioMeta := actionCtx.IOMetadata()
+	log.Infof("IOMetadata %T: %+v", ioMeta, ioMeta)
+	flowDetail := context.FlowDetails()
+	log.Infof("FlowDetails %T: %+v", flowDetail, flowDetail)
+
 	// TODO: transform data here
 	value := source
 	context.SetOutput(ovValue, value)

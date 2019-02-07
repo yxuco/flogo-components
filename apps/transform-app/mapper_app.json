@@ -1,0 +1,434 @@
+{
+  "name": "Mapper App",
+  "type": "flogo:app",
+  "version": "0.0.1",
+  "appModel": "1.0.0",
+  "description": "Sample flogo app",
+  "triggers": [
+    {
+      "id": "receive_http_message",
+      "ref": "github.com/TIBCOSoftware/flogo-contrib/trigger/rest",
+      "name": "Receive HTTP Message",
+      "description": "Simple REST Trigger",
+      "settings": {
+        "port": "$env[HTTPPORT]"
+      },
+      "handlers": [
+        {
+          "action": {
+            "ref": "github.com/TIBCOSoftware/flogo-contrib/action/flow",
+            "data": {
+              "flowURI": "res://flow:mapper_flow"
+            },
+            "mappings": {
+              "input": [
+                {
+                  "mapTo": "event",
+                  "type": "assign",
+                  "value": "$.pathParams.event"
+                },
+                {
+                  "mapTo": "content",
+                  "type": "assign",
+                  "value": "$.content"
+                }
+              ],
+              "output": [
+                {
+                  "mapTo": "code",
+                  "type": "assign",
+                  "value": "$.code"
+                },
+                {
+                  "mapTo": "data",
+                  "type": "assign",
+                  "value": "$.message"
+                }
+              ]
+            }
+          },
+          "settings": {
+            "method": "POST",
+            "path": "/demo/:event"
+          }
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "flow:mapper_flow",
+      "data": {
+        "name": "Mapper Flow",
+        "metadata": {
+          "input": [
+            {
+              "name": "event",
+              "type": "string"
+            },
+            {
+              "name": "content",
+              "type": "any"
+            }
+          ],
+          "output": [
+            {
+              "name": "code",
+              "type": "integer"
+            },
+            {
+              "name": "message",
+              "type": "any"
+            }
+          ]
+        },
+        "tasks": [
+          {
+            "id": "log_2",
+            "name": "LogInput",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "expression",
+                    "value": "string.concat(\"Received event \", $flow.event, \": \", $flow.content)",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "app_16",
+            "name": "Set Inventory",
+            "description": "Simple Global App Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/app",
+              "input": {
+                "operation": "ADD",
+                "type": "object"
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "inventory",
+                    "mapTo": "attribute"
+                  },
+                  {
+                    "type": "object",
+                    "value": {
+                      "vehicle": [
+                        {
+                          "@id": 942297,
+                          "vin": {
+                            "@readOnly": true,
+                            "value": "1GNSK3EC1FRXXXXXX"
+                          },
+                          "label": "E M660",
+                          "color": "WHITE",
+                          "make": "CHEVROLET",
+                          "model": "TAHOE",
+                          "deviceSerialNumber": {
+                            "@readOnly": true,
+                            "value": "50X00XXX8X"
+                          },
+                          "year": 2015,
+                          "odometer": {
+                            "@units": "MILES",
+                            "@timestamp": "2018-07-16T11:51:17Z",
+                            "@readOnly": "TRUE",
+                            "value": 26775.18
+                          },
+                          "engineRunTime": {
+                            "@isTracked": "NO",
+                            "@readOnly": "TRUE",
+                            "value": "PT0.000S"
+                          },
+                          "licensePlate": {
+                            "@state": "NY",
+                            "@country": "US",
+                            "value": "AXXXXX"
+                          },
+                          "trackableItemType": "VEHICLE",
+                          "fuelType": "GASOLINE",
+                          "createdTimestamp": {
+                            "@readOnly": true,
+                            "value": "2018-06-28T15:05:12Z"
+                          },
+                          "modifiedTimestamp": {
+                            "@readOnly": true,
+                            "value": "2018-06-28T15:05:12Z"
+                          }
+                        },
+                        {
+                          "@id": 763803,
+                          "vin": {
+                            "@readOnly": true,
+                            "value": "1FTFX1EF9EFXXXXXX"
+                          },
+                          "label": "LW04",
+                          "color": "WHITE",
+                          "make": "FORD",
+                          "model": "F-150",
+                          "deviceSerialNumber": {
+                            "@readOnly": true,
+                            "value": "5X147XX5XX"
+                          },
+                          "year": 2014,
+                          "odometer": {
+                            "@units": "MILES",
+                            "@timestamp": "2018-11-02T14:57:56Z",
+                            "@readOnly": "TRUE",
+                            "value": 22425.99
+                          },
+                          "engineRunTime": {
+                            "@isTracked": "NO",
+                            "@readOnly": "TRUE",
+                            "value": "PT0.000S"
+                          },
+                          "licensePlate": {
+                            "@state": "NY",
+                            "@country": "US",
+                            "value": "XB3XXX"
+                          },
+                          "trackableItemType": "VEHICLE",
+                          "fuelType": "GASOLINE",
+                          "createdTimestamp": {
+                            "@readOnly": true,
+                            "value": "2016-12-06T17:58:22Z"
+                          },
+                          "modifiedTimestamp": {
+                            "@readOnly": true,
+                            "value": "2016-12-06T17:58:22Z"
+                          }
+                        },
+                        {
+                          "@id": 763800,
+                          "vin": {
+                            "@readOnly": true,
+                            "value": "XXT0X20FPXXX0XXX9"
+                          },
+                          "label": "LWB1",
+                          "color": "YELLOW",
+                          "make": "CAT",
+                          "model": "BACKHOE",
+                          "deviceSerialNumber": {
+                            "@readOnly": true,
+                            "value": "50XX6X7X4X"
+                          },
+                          "year": 2000,
+                          "odometer": {
+                            "@units": "MILES",
+                            "@timestamp": "2018-11-05T15:49:10Z",
+                            "@readOnly": "TRUE",
+                            "value": 5013.63
+                          },
+                          "engineRunTime": {
+                            "@isTracked": "NO",
+                            "@readOnly": "TRUE",
+                            "value": "PT0.000S"
+                          },
+                          "licensePlate": {
+                            "@state": "NY",
+                            "@country": "US",
+                            "value": "XJ8XXX"
+                          },
+                          "trackableItemType": "VEHICLE",
+                          "fuelType": "GASOLINE",
+                          "createdTimestamp": {
+                            "@readOnly": true,
+                            "value": "2016-12-06T17:55:35Z"
+                          },
+                          "modifiedTimestamp": {
+                            "@readOnly": true,
+                            "value": "2016-12-06T17:55:35Z"
+                          }
+                        }
+                      ]
+                    },
+                    "mapTo": "value"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "log_17",
+            "name": "Log First",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "$activity[app_16].value.vehicle[0]",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "jsmapper_18",
+            "name": "Map First",
+            "description": "JSONata Mapper Activity",
+            "activity": {
+              "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
+              "input": {
+                "mapexpr": "TODO map of first vehicle"
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "object",
+                    "value": {
+                      "event": "{{$flow.event}}",
+                      "content": "{{$flow.content}}",
+                      "inventory": "{{$activity[app_16].value.vehicle[0]}}"
+                    },
+                    "mapTo": "source"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "actreturn_19",
+            "name": "Return First",
+            "description": "Simple Return Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/actreturn",
+              "input": {
+                "mappings": [
+                  {
+                    "mapTo": "code",
+                    "type": "literal",
+                    "value": 200
+                  },
+                  {
+                    "mapTo": "message",
+                    "type": "assign",
+                    "value": "$activity[jsmapper_18].value"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "log_20",
+            "name": "Log List",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "$activity[app_16].value",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "jsmapper_21",
+            "name": "Map List",
+            "description": "JSONata Mapper Activity",
+            "activity": {
+              "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
+              "input": {
+                "mapexpr": "TODO map whole inventory"
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "object",
+                    "value": {
+                      "event": "{{$flow.event}}",
+                      "content": "{{$flow.content}}",
+                      "inventory": "{{$activity[app_16].value.vehicle}}"
+                    },
+                    "mapTo": "source"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "actreturn_22",
+            "name": "Return List",
+            "description": "Simple Return Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/actreturn",
+              "input": {
+                "mappings": [
+                  {
+                    "mapTo": "code",
+                    "type": "literal",
+                    "value": 200
+                  },
+                  {
+                    "mapTo": "message",
+                    "type": "assign",
+                    "value": "$activity[jsmapper_21].value"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "links": [
+          {
+            "from": "log_2",
+            "to": "app_16"
+          },
+          {
+            "from": "app_16",
+            "to": "log_17",
+            "type": "expression",
+            "value": "$flow.event == \"first\""
+          },
+          {
+            "from": "log_17",
+            "to": "jsmapper_18"
+          },
+          {
+            "from": "jsmapper_18",
+            "to": "actreturn_19"
+          },
+          {
+            "from": "app_16",
+            "to": "log_20",
+            "type": "expression",
+            "value": "$flow.event == \"list\""
+          },
+          {
+            "from": "log_20",
+            "to": "jsmapper_21"
+          },
+          {
+            "from": "jsmapper_21",
+            "to": "actreturn_22"
+          }
+        ]
+      }
+    }
+  ]
+}
