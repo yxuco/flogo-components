@@ -2,6 +2,7 @@ package jsmapper
 
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
+	"github.com/TIBCOSoftware/flogo-lib/core/data"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 )
 
@@ -50,7 +51,17 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 	wd := actionCtx.WorkingData()
 	log.Infof("WorkingData %T: %+v", wd, wd)
 
-	log.Infof("Context %T: %+v", context, context)
+	switch v := wd.(type) {
+	case *data.FixedScope:
+		log.Infof("FixedScope %T: %+v", v, v)
+	default:
+		log.Infof("working data scope type %T: %+v", v, v)
+	}
+
+	switch v := context.(type) {
+	default:
+		log.Infof("Context %T: %+v", v, v)
+	}
 
 	// TODO: transform data here
 	value := source
