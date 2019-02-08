@@ -287,7 +287,7 @@
             "activity": {
               "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
               "input": {
-                "mapexpr": "TODO map of first vehicle"
+                "mapexpr": "{\"event\":$flow.event,\"street\":$flow.content.address.street,\"message\":$activity[app_2].message,\"vehicle\":$activity[app_16].value.vehicle[0].{\"make\":make,\"year\":year,\"vin\":vin.value}}"
               },
               "mappings": {
                 "input": [
@@ -354,7 +354,7 @@
             "activity": {
               "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
               "input": {
-                "mapexpr": "TODO map whole inventory"
+                "mapexpr": "{\"event\":$flow.event,\"street\":$flow.content.address.street,\"message\":$activity[app_2].message,\"vehicle\":$activity[app_16].value.vehicle.{\"make\":make,\"year\":year,\"vin\":vin.value}}"
               },
               "mappings": {
                 "input": [
