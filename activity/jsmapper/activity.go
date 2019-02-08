@@ -117,7 +117,8 @@ func collectActivityData(attrs []string, context activity.Context) (data map[str
 			// fetch data from flow context, and store it in map[string]interface{} for JSON
 			value, err := GetData("$"+a, context)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to collect activity data for $%s", a)
+				log.Warnf("error fetch data for %s: %+v", a, err)
+				continue
 			}
 			activityMap, ok := data[key]
 			if !ok {
@@ -150,7 +151,8 @@ func collectFlowData(attrs []string, context activity.Context) (data map[string]
 			key := strings.TrimSpace(a[5:])
 			value, err := GetData("$"+a, context)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to collect flow data for $%s", a)
+				log.Warnf("error fetch data for %s: %+v", a, err)
+				continue
 			}
 			if s, ok := value.(string); ok {
 				// value is a string, so try to unmarshal JSON
