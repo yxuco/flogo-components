@@ -9,19 +9,14 @@
   "author": "Yueming Xu <yxu@tibco.com>",
   "input":[
     {
-      "name": "source",
-      "type": "any",
-      "required": true
-    },
-    {
       "name": "mapexpr",
-      "type": "any"
+      "type": "string"
     }
   ],
   "output": [
     {
       "name": "value",
-      "type": "any"
+      "type": "string"
     }
   ]
 }

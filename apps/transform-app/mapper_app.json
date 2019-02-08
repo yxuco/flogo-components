@@ -288,19 +288,6 @@
               "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
               "input": {
                 "mapexpr": "{\"port\":{{$env[HTTPPORT]}},\"event\":{{$flow.event}},\"street\":{{$flow.content}}.address.street,\"message\":{{$activity[log_2].message}},\"vehicle\":{{$activity[app_16].value}}.vehicle[0].{\"make\":make,\"year\":year,\"vin\":vin.value}}"
-              },
-              "mappings": {
-                "input": [
-                  {
-                    "type": "object",
-                    "value": {
-                      "event": "{{$flow.event}}",
-                      "content": "{{$flow.content}}",
-                      "inventory": "{{$activity[app_16].value.vehicle[0]}}"
-                    },
-                    "mapTo": "source"
-                  }
-                ]
               }
             }
           },
@@ -355,19 +342,6 @@
               "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
               "input": {
                 "mapexpr": "{\"port\":{{$env[HTTPPORT]}},\"event\":{{$flow.event}},\"street\":{{$flow.content}}.address.street,\"message\":{{$activity[log_2].message}},\"vehicle\":{{$activity[app_16].value}}.vehicle.{\"make\":make,\"year\":year,\"vin\":vin.value}}"
-              },
-              "mappings": {
-                "input": [
-                  {
-                    "type": "object",
-                    "value": {
-                      "event": "{{$flow.event}}",
-                      "content": "{{$flow.content}}",
-                      "inventory": "{{$activity[app_16].value.vehicle}}"
-                    },
-                    "mapTo": "source"
-                  }
-                ]
               }
             }
           },

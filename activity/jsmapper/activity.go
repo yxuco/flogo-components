@@ -9,6 +9,7 @@ import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
 	"github.com/pkg/errors"
+	"github.com/yxuco/flogo-components/activity/jsmapper/gojsonata"
 )
 
 var log = logger.GetLogger("activity-tibco-jsmapper")
@@ -41,12 +42,12 @@ func (a *JsMapActivity) Metadata() *activity.Metadata {
 func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 
 	mapexpr := context.GetInput(ivMapexpr).(string)
-	log.Info("Mapper expression:", mapexpr)
+	log.Debug("Mapper expression:", mapexpr)
 
 	// convert expr to JSONata expression, and extract names of required flow resources
 	expr, attrs := prepareMapper(mapexpr)
-	log.Info("JSONata expr:", expr)
-	log.Infof("required flow data: %+v\n", attrs)
+	log.Debug("JSONata expr:", expr)
+	log.Debugf("required flow data: %+v\n", attrs)
 
 	if len(attrs) == 0 {
 		// no input data is referenced, so set output to a constant expr
@@ -61,16 +62,22 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 		log.Errorf("%+v", err)
 		return false, err
 	}
-	log.Infof("constructed source: %+v", source)
+	log.Debugf("constructed source: %+v", source)
 
-	if out, err := json.MarshalIndent(source, "", "  "); err != nil {
-		log.Errorf("failed to marshal JSON %+v", err)
-	} else {
-		log.Info("source data:", string(out))
+	srcJSON, err := json.Marshal(source)
+	if err != nil {
+		log.Errorf("failed to marshal source JSON %+v", err)
+		return false, err
 	}
+	log.Debug("source data:", string(srcJSON))
 
-	// TODO: transform data here
-	value := source
+	// Transform srcJSON by applying JSONata expression
+	value, err := gojsonata.Transform(string(srcJSON), expr)
+	if err != nil {
+		log.Errorf("failed JSONata transformation %+v", err)
+		return false, err
+	}
+	log.Info("Transformation result", value)
 	context.SetOutput(ovValue, value)
 	return true, nil
 }
