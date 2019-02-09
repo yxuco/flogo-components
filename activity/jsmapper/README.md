@@ -43,7 +43,7 @@ Inputs and Outputs:
 | value    |          | Transformation result, or source data if expr is not specified |
 
 ## Mapping Examples
-Query/translate output data from any other activities in the same flow
+The sample application [transform-app](https://github.com/yxuco/flogo-components/tree/master/apps/transform-app) contains the following activity that transforms output data from any other activities in the same flow.
 
 ```json
 {
@@ -58,7 +58,7 @@ Query/translate output data from any other activities in the same flow
   }
 }
 ```
-The `mapexpr` is a JSONata expression containing tags of flogo data, i.e., envirionment variables, flow properties, and/or output of any flogo activities reachable in the same flow.  For example, the following expression is demonstrated by the sample transform-app:
+The `mapexpr` is a JSONata expression containing tags of flogo data, including envirionment variables, flow properties, and/or output data from other flogo activities reachable in the same flow.  For example, `transform-app` contains the following expression:
 ```
 {
   "port": {{$env[HTTPPORT]}},
@@ -107,13 +107,13 @@ The output of this transformation is as follows:
 ```
 
 ## Transformation Expression
-In the transformation expression, Flogo data sources must be tagged as format of `{{$...}}`.  On the Flogo UI, you can enter these tags by clicking the corresponding item in the list of "Available Data".  You can then add the double curly brackets around the data tag.
+In the transformation expression, Flogo data sources must be tagged as format of `{{$...}}`.  On the Flogo UI, you can enter these tags by clicking the corresponding item in the list of "Available Data".  You can then add double curly brackets around the data tag.
 
-Except for these data tags, the expression syntax should match [JSONata](http://jsonata.org/) specification.  The expression can use any of the JSONata [functions](http://docs.jsonata.org/string-functions), e.g., for string manipulation, and aggregation, etc.
+Except for these data tags, the expression should match [JSONata](http://jsonata.org/) specification.  The expression can use any of the JSONata [functions](http://docs.jsonata.org/string-functions), e.g., for string manipulation, and aggregation, etc.
 
-You can develop and test the JSONata expressions at http://try.jsonata.org/.
+You can develop and test JSONata expressions at http://try.jsonata.org/.
 
-This transformer activity does not support Golang functions at present.  However, if it is necessary, it can be extended to support Golang functions and/or other custom JavaScript functions besides the core functions provided by JSONata.
+This transformer activity does not support Golang functions at present.  However, if it is necessary, it can be extended to support Golang functions, as well as other custom JavaScript functions besides the core functions provided by JSONata.
 
 ## Future Improvement
-The editor for the JSONata expression can be improved, so it can at least support multi-line strings.  It would be even better if Flogo UI can generate the JSONata expression by visual drag-and-drop.
+The editor for the JSONata expression can be improved, so it can at least support multi-line display.  It would be even better if Flogo UI can generate the JSONata expression by visual drag-and-drop.
