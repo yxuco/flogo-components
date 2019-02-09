@@ -10,7 +10,8 @@
   "input":[
     {
       "name": "mapexpr",
-      "type": "string"
+      "type": "string",
+      "required": true
     }
   ],
   "output": [

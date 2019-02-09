@@ -42,12 +42,12 @@ func (a *JsMapActivity) Metadata() *activity.Metadata {
 func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 
 	mapexpr := context.GetInput(ivMapexpr).(string)
-	log.Debug("Mapper expression:", mapexpr)
+	log.Debug("Mapper expression: ", mapexpr)
 
 	// convert expr to JSONata expression, and extract names of required flow resources
 	expr, attrs := prepareMapper(mapexpr)
-	log.Debug("JSONata expr:", expr)
-	log.Debugf("required flow data: %+v\n", attrs)
+	log.Debug("JSONata expr: ", expr)
+	log.Debugf("required flow data: %+v", attrs)
 
 	if len(attrs) == 0 {
 		// no input data is referenced, so set output to a constant expr
@@ -69,7 +69,7 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 		log.Errorf("failed to marshal source JSON %+v", err)
 		return false, err
 	}
-	log.Debug("source data:", string(srcJSON))
+	log.Debug("source data: ", string(srcJSON))
 
 	// Transform srcJSON by applying JSONata expression
 	value, err := gojsonata.Transform(string(srcJSON), expr)
@@ -77,7 +77,7 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 		log.Errorf("failed JSONata transformation %+v", err)
 		return false, err
 	}
-	log.Info("Transformation result", value)
+	log.Info("Transformation result: ", value)
 	context.SetOutput(ovValue, value)
 	return true, nil
 }
