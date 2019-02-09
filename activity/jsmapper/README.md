@@ -15,6 +15,22 @@ On "Add Activity dialog", select "Install New Activity", then paste the followin
 flogo install github.com/yxuco/flogo-components/activity/jsmapper
 ```
 
+## Dependencies
+The implementation of this activity depends on the Flogo libs, i.e.,
+```bash
+go get -u github.com/TIBCOSoftware/flogo-lib/...
+go get -u github.com/TIBCOSoftware/flogo-contrib/...
+go get -u github.com/TIBCOSoftware/flogo-cli/...
+go get -u github.com/TIBCOSoftware/flogo/...
+```
+
+Besides, this activity also depends on the following Go packages:
+```bash
+go get -u github.com/pkg/errors
+go get -u github.com/robertkrimen/otto
+go get -u github.com/stretchr/testify
+```
+
 ## Schema
 Inputs and Outputs:
 
