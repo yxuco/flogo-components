@@ -40,10 +40,10 @@ Inputs and Outputs:
 | Setting  | Required | Description |
 |:---------|:---------|:------------|
 | mapexpr  | True     | JSONata expression for data transformation |
-| value    |          | Transformation result, or source data if expr is not specified |
+| value    |          | Transformation result, or the expr itself if it does not contain any source tag |
 
 ## Mapping Examples
-The sample application [transform-app](https://github.com/yxuco/flogo-components/tree/master/apps/transform-app) contains the following activity that transforms output data from any other activities in the same flow.
+The sample application [transform-app](https://github.com/yxuco/flogo-components/tree/master/apps/transform-app) contains the following activity that transforms output data from other activities in the same flow.
 
 ```json
 {
@@ -72,11 +72,11 @@ The `mapexpr` is a JSONata expression containing tags of flogo data, including e
   }
 }
 ```
-The above expression includes the following data items available in the flogo flow:
+The above expression includes the following data items from the flogo flow:
 * An environment variable `HTTPPORT`, which could be specified when launching the application;
 * 2 flow properties `event` and `content`, which could be set by mappings in the trigger.  The `content` in this example is a JSON string that contains a street attribute in an address;
 * A simple string attribute `message` from the activity `log_2`;
-* A complex JSON attribute `value` from the activity `app_16`, which contains multiple `vehicle` objects.  The details of the vehicles is shown in [inventory.json](https://github.com/yxuco/flogo-components/tree/master/apps/transform-app/inventory.json).
+* A complex JSON attribute `value` from the activity `app_16`, which contains multiple `vehicle` objects.  The details of the vehicles are shown in [inventory.json](https://github.com/yxuco/flogo-components/tree/master/apps/transform-app/inventory.json).
 
 The output of this transformation is as follows:
 
@@ -107,7 +107,7 @@ The output of this transformation is as follows:
 ```
 
 ## Transformation Expression
-In the transformation expression, Flogo data sources must be tagged as format of `{{$...}}`.  On the Flogo UI, you can enter these tags by clicking the corresponding item in the list of "Available Data".  You can then add double curly brackets around the data tag.
+In the transformation expression, Flogo data sources must be tagged in the form of `{{$...}}`.  On the Flogo UI, you can enter these tags by clicking an item in the list of "Available Data".  You can then add double curly brackets around the data tag.
 
 Except for these data tags, the expression should match [JSONata](http://jsonata.org/) specification.  The expression can use any of the JSONata [functions](http://docs.jsonata.org/string-functions), e.g., for string manipulation, and aggregation, etc.
 
