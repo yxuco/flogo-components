@@ -41,6 +41,10 @@ Inputs and Outputs:
       "name": "mapexpr",
       "type": "string",
       "required": true
+    },
+    {
+      "name": "serializeOutput",
+      "type": "boolean"
     }
   ],
   "output": [
@@ -53,10 +57,11 @@ Inputs and Outputs:
 ```
 
 ## Settings
-| Setting  | Required | Description |
-|:---------|:---------|:------------|
-| mapexpr  | True     | JSONata expression for data transformation |
-| value    |          | Transformation result, or the expr itself if it does not contain any source tag |
+| Setting          | Required | Description |
+|:-----------------|:---------|:------------|
+| mapexpr          | True     | JSONata expression for data transformation |
+| serializeOutput  | False    | Serialize the result to JSON string if it is true |
+| value            |          | Transformation result, or the expr itself if it does not contain any source tag |
 
 ## Mapping Examples
 The sample application [transform-app](https://github.com/yxuco/flogo-components/tree/master/apps/transform-app) contains the following activity that transforms output data from other activities in the same flow.
@@ -69,7 +74,8 @@ The sample application [transform-app](https://github.com/yxuco/flogo-components
   "activity": {
     "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
     "input": {
-      "mapexpr": "jsonata expression"
+      "mapexpr": "jsonata expression",
+      "serializeOutput": false
     }
   }
 }
@@ -121,6 +127,8 @@ The output of this transformation is as follows:
   ]
 }
 ```
+
+When `serializeOutput` is set to `true`, the transformation result will be returned as a serialized JSON string.  However, Flogo handles the result as JSON object even if it is serialized.  For example, in a Flogo activity following a `jsmapper`, you can access an attribute in the mapper result by e.g., `$activity[jsmapper_18].value.vehicle[0].make`, even if the output value of `jsmapper_18` is serialized to a string.
 
 ## Transformation Expression
 In the transformation expression, Flogo data sources must be tagged in the form of `{{$...}}`.  On the Flogo UI, you can enter these tags by clicking an item in the list of "Available Data".  You can then add double curly brackets around the data tag.
