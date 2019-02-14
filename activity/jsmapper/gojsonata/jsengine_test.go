@@ -6,6 +6,7 @@
 package gojsonata
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -52,10 +53,27 @@ func TestCallScript(t *testing.T) {
 }
 
 func TestTransform(t *testing.T) {
-	result, err := Transform(vehicleData, vehicleExpr)
+	source := make(map[string]interface{})
+	err := json.Unmarshal([]byte(vehicleData), &source)
+	require.NoError(t, err, "unmarshal vehicle data should not be error")
+	result, err := Transform(source, vehicleExpr)
 	require.NoError(t, err, "call transform function should not be error")
-	fmt.Printf("result value: %s\n", result)
-	assert.Equal(t, vehicleResult, result, "result should match content of vehicleResult")
+	data, err := json.Marshal(result)
+	require.NoError(t, err, "json marshal should not be error")
+	fmt.Printf("result value: %s\n", string(data))
+	assert.Equal(t, vehicleResult, string(data), "result should match content of vehicleResult")
+}
+
+func TestTransformArray(t *testing.T) {
+	source := make(map[string]interface{})
+	err := json.Unmarshal([]byte(vehicleData), &source)
+	require.NoError(t, err, "unmarshal vehicle data should not be error")
+	result, err := Transform(source, vehicleExpr)
+	require.NoError(t, err, "call transform function should not be error")
+
+	array := result.([]map[string]interface{})
+	fmt.Printf("result array type %T, first item: %+v\n", result, array[0])
+	assert.Equal(t, "CHEVROLET", array[0]["make"].(string), "first vehicle make should be 'CHEVROLET'")
 }
 
 var vehicleData = `{

@@ -59,8 +59,7 @@ func init() {
 	// define global js function for jsonata transformation
 	jsengine.Run(`var transform = function(data, expr) {
 		var expression = jsonata(expr);
-		var result = expression.evaluate(JSON.parse(data));
-		return JSON.stringify(result);
+		return expression.evaluate(data);
 	}`)
 }
 
@@ -74,13 +73,13 @@ func CachedModules() []string {
 	return keys
 }
 
-// Transform executes JSONata expression on input JSON data, and returns the transformation result
-func Transform(data, expr string) (string, error) {
+// Transform executes JSONata expression on input JSON data, and returns the transformation result as Go interface{}
+func Transform(data interface{}, expr string) (interface{}, error) {
 	value, err := jsengine.Call("transform", nil, data, expr)
 	if err != nil {
-		return "", errors.Wrapf(err, "failed to transform data")
+		return nil, errors.Wrapf(err, "failed to transform data")
 	}
-	return value.String(), nil
+	return value.Export()
 }
 
 // CallScriptFile evaluates content of js or json file, and return value of specified result var

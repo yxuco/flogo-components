@@ -15,8 +15,9 @@ import (
 var log = logger.GetLogger("activity-tibco-jsmapper")
 
 const (
-	ivMapexpr = "mapexpr"
-	ovValue   = "value"
+	ivMapexpr   = "mapexpr"
+	ivSerialize = "serializeOutput"
+	ovValue     = "value"
 
 	envTag      = "env["
 	flowTag     = "flow."
@@ -44,6 +45,9 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 	mapexpr := context.GetInput(ivMapexpr).(string)
 	log.Debug("Mapper expression: ", mapexpr)
 
+	doSerialize := context.GetInput(ivSerialize).(bool)
+	log.Debug("Serialize output: ", doSerialize)
+
 	// convert expr to JSONata expression, and extract names of required flow resources
 	expr, attrs := prepareMapper(mapexpr)
 	log.Debug("JSONata expr: ", expr)
@@ -64,20 +68,29 @@ func (a *JsMapActivity) Eval(context activity.Context) (done bool, err error) {
 	}
 	log.Debugf("constructed source: %+v", source)
 
-	srcJSON, err := json.Marshal(source)
-	if err != nil {
-		log.Errorf("failed to marshal source JSON %+v", err)
-		return false, err
-	}
-	log.Debug("source data: ", string(srcJSON))
+	// srcJSON, err := json.Marshal(source)
+	// if err != nil {
+	// 	log.Errorf("failed to marshal source JSON %+v", err)
+	// 	return false, err
+	// }
+	// log.Debug("source data: ", string(srcJSON))
 
-	// Transform srcJSON by applying JSONata expression
-	value, err := gojsonata.Transform(string(srcJSON), expr)
+	// Transform source by applying JSONata expression
+	value, err := gojsonata.Transform(source, expr)
 	if err != nil {
 		log.Errorf("failed JSONata transformation %+v", err)
 		return false, err
 	}
-	log.Info("Transformation result: ", value)
+
+	if doSerialize {
+		if result, err := json.Marshal(value); err == nil {
+			// serialized JSON string
+			log.Infof("JSON result: %+v\n", string(result))
+			context.SetOutput(ovValue, string(result))
+			return true, nil
+		}
+	}
+	log.Infof("Transformation result: %+v\n", value)
 	context.SetOutput(ovValue, value)
 	return true, nil
 }

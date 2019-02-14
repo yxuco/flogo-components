@@ -12,12 +12,16 @@
       "name": "mapexpr",
       "type": "string",
       "required": true
+    },
+    {
+      "name": "serializeOutput",
+      "type": "boolean"
     }
   ],
   "output": [
     {
       "name": "value",
-      "type": "string"
+      "type": "any"
     }
   ]
 }
