@@ -287,27 +287,49 @@
             "activity": {
               "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
               "input": {
-                "mapexpr": "{\"port\":{{$env[HTTPPORT]}},\"event\":{{$flow.event}},\"street\":{{$flow.content}}.address.street,\"message\":{{$activity[log_2].message}},\"vehicle\":{{$activity[app_16].value}}.vehicle[0].{\"make\":make,\"year\":year,\"vin\":vin.value}}"
+                "mapexpr": "{\"port\":{{$env[HTTPPORT]}},\"event\":{{$flow.event}},\"street\":{{$flow.content}}.address.street,\"message\":{{$activity[log_2].message}},\"vehicle\":{{$activity[app_16].value}}.vehicle[0].{\"make\":make,\"year\":year,\"vin\":vin.value}}",
+                "serializeOutput": true
               }
             }
           },
           {
-            "id": "actreturn_19",
-            "name": "Return First",
+            "id": "log_24",
+            "name": "LogVehicle",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "$activity[jsmapper_18].value.vehicle",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "actreturn_25",
+            "name": "ReturnFirst",
             "description": "Simple Return Activity",
             "activity": {
               "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/actreturn",
               "input": {
                 "mappings": [
                   {
-                    "mapTo": "code",
-                    "type": "literal",
-                    "value": 200
-                  },
-                  {
                     "mapTo": "message",
                     "type": "assign",
                     "value": "$activity[jsmapper_18].value"
+                  },
+                  {
+                    "mapTo": "code",
+                    "type": "literal",
+                    "value": 200
                   }
                 ]
               }
@@ -341,13 +363,35 @@
             "activity": {
               "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
               "input": {
-                "mapexpr": "{\"port\":{{$env[HTTPPORT]}},\"event\":{{$flow.event}},\"street\":{{$flow.content}}.address.street,\"message\":{{$activity[log_2].message}},\"vehicle\":{{$activity[app_16].value}}.vehicle.{\"make\":make,\"year\":year,\"vin\":vin.value}}"
+                "mapexpr": "{{$activity[app_16].value}}.vehicle.{\"make\":make,\"year\":year,\"vin\":vin.value}",
+                "serializeOutput": false
               }
             }
           },
           {
-            "id": "actreturn_22",
-            "name": "Return List",
+            "id": "log_22",
+            "name": "LogFirstItem",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "$activity[jsmapper_21].value[0]",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "actreturn_23",
+            "name": "ReturnList",
             "description": "Simple Return Activity",
             "activity": {
               "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/actreturn",
@@ -360,8 +404,8 @@
                   },
                   {
                     "mapTo": "message",
-                    "type": "assign",
-                    "value": "$activity[jsmapper_21].value"
+                    "type": "expression",
+                    "value": "string.concat(\"map result:\", $activity[jsmapper_21].value, \"; first make:\", $activity[jsmapper_21].value[0].make)"
                   }
                 ]
               }
@@ -385,7 +429,11 @@
           },
           {
             "from": "jsmapper_18",
-            "to": "actreturn_19"
+            "to": "log_24"
+          },
+          {
+            "from": "log_24",
+            "to": "actreturn_25"
           },
           {
             "from": "app_16",
@@ -399,7 +447,11 @@
           },
           {
             "from": "jsmapper_21",
-            "to": "actreturn_22"
+            "to": "log_22"
+          },
+          {
+            "from": "log_22",
+            "to": "actreturn_23"
           }
         ]
       }
