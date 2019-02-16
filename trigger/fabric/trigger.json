@@ -1,0 +1,37 @@
+{
+  "name": "dovetail-fabric",
+  "version": "0.0.1",
+  "type": "flogo:trigger",
+  "ref": "github.com/yxuco/flogo-components/trigger/fabric",
+  "title": "Chaincode Invoke",
+  "description": "Chaincode Transaction Trigger",
+  "homepage": "https://github.com/yxuco/flogo-components/tree/master/trigger/fabric",
+  "author": "Yumeming Xu <yxu@tibco.com>",
+  "settings":[
+  ],
+  "output": [
+    {
+      "name": "data",
+      "type": "object"
+    }
+  ],
+  "reply": [
+    {
+      "name": "result",
+      "type": "string"
+    }
+  ],
+  "handler": {
+    "settings": [
+      {
+        "name": "function",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "args",
+        "type": "array"
+      }
+    ]
+  }
+}
