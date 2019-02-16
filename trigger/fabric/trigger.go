@@ -39,6 +39,11 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 	for _, handler := range t.handlers {
 		fn := handler.GetStringSetting("function")
 		log.Info("init function:", fn)
+		_, ok := TriggerMap[fn]
+		if ok {
+			log.Warnf("function %s used by multiple trigger handlers, only the last handler is effective")
+		}
+		TriggerMap[fn] = t
 		args, ok := handler.GetSetting("args")
 		if ok {
 			log.Infof("init args: %T, %+v", args, args)
