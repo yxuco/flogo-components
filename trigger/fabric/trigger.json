@@ -13,7 +13,15 @@
     {
       "name": "data",
       "type": "any"
-    }
+    },
+    {
+      "name": "txID",
+      "type": "string"
+    },
+    {
+      "name": "txTime",
+      "type": "string"
+    }  
   ],
   "reply": [
     {

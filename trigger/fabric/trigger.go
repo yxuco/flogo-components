@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
@@ -18,6 +19,8 @@ const (
 	sFunction = "function"
 	sArgs     = "args"
 	oData     = "data"
+	oTxID     = "txID"
+	oTxTime   = "txTime"
 	rResult   = "result"
 	cStub     = "chaincode-stub"
 )
@@ -116,6 +119,10 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 		flowData := make(map[string]interface{})
 		flowData[oData] = data
 		flowData[cStub] = stub
+		flowData[oTxID] = stub.GetTxID()
+		if ts, err := stub.GetTxTimestamp(); err == nil {
+			flowData[oTxTime] = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC().Format("2006-01-02T15:04:05.000000-0700")
+		}
 
 		// execute flogo flow
 		results, err := handler.Handle(context.Background(), flowData)
