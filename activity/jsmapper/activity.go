@@ -195,7 +195,7 @@ func collectFlowData(attrs []string, context activity.Context) (data map[string]
 func unmarshalString(data string) interface{} {
 	s := strings.TrimSpace(data)
 	if strings.HasPrefix(s, "[") {
-		var result []map[string]interface{}
+		var result []interface{}
 		if err := json.Unmarshal([]byte(data), &result); err != nil {
 			return s
 		}

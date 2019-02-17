@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
+	"github.com/stretchr/testify/assert"
 )
 
 func getJSONMetadata() string {
@@ -51,4 +52,27 @@ func TestCreate(t *testing.T) {
 	if trg == nil {
 		t.Fail()
 	}
+}
+
+func TestUnmarshal(t *testing.T) {
+	s := `[{"n1":"v1"}, {"n2":"v2"}]`
+	result := unmarshalString(s)
+	array, ok := result.([]interface{})
+	assert.True(t, ok, "result should be array of map[string]interface{}")
+	assert.Equal(t, 2, len(array), "result array length should be 2")
+
+	s = `["n1", "n2"]`
+	result = unmarshalString(s)
+	sArray, ok := result.([]interface{})
+	assert.True(t, ok, "result should be array of interface{}")
+	assert.Equal(t, 2, len(sArray), "result array length should be 2")
+
+	s = `["n1", {"n2":"v2"}]`
+	result = unmarshalString(s)
+	sArray, ok = result.([]interface{})
+	assert.True(t, ok, "result should be array of interface{}")
+	assert.Equal(t, 2, len(sArray), "result array length should be 2")
+	obj, ok := sArray[1].(map[string]interface{})
+	assert.True(t, ok, "second array item should be of type may[string]interface{}")
+	assert.Equal(t, "v2", obj["n2"].(string), "obj should contain value 'v2'")
 }

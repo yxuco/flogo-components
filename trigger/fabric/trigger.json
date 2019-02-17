@@ -1,5 +1,5 @@
 {
-  "name": "dovetail-fabric",
+  "name": "fabric-invoke",
   "version": "0.0.1",
   "type": "flogo:trigger",
   "ref": "github.com/yxuco/flogo-components/trigger/fabric",
@@ -12,7 +12,7 @@
   "output": [
     {
       "name": "data",
-      "type": "object"
+      "type": "any"
     }
   ],
   "reply": [
