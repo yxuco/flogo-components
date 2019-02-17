@@ -5,7 +5,7 @@ APP_NAME      := flogo_cc
 LOG_LEVEL     := INFO
 
 .PHONY: all
-all: create build run
+all: create build
 
 .PHONY: clean
 clean:
