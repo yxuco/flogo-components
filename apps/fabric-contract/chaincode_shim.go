@@ -5,10 +5,15 @@ import (
 	"os"
 
 	"github.com/TIBCOSoftware/flogo-lib/app"
+	"github.com/TIBCOSoftware/flogo-lib/core/data"
 	"github.com/TIBCOSoftware/flogo-lib/engine"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
 	"github.com/hyperledger/fabric/protos/peer"
 	trigger "github.com/yxuco/flogo-components/trigger/fabric"
+)
+
+const (
+	fabricTrigger = "github.com/yxuco/flogo-components/trigger/fabric"
 )
 
 // Contract implements chaincode interface for invoking Flogo flows
@@ -51,13 +56,14 @@ func main() {
 		cp = app.DefaultConfigProvider()
 	}
 
-	app, err := cp.GetApp()
+	ac, err := cp.GetApp()
 	if err != nil {
 		fmt.Printf("failed to read Flogo app config: %+v\n", err)
 		os.Exit(1)
 	}
 
-	e, err := engine.New(app)
+	addChaincodeStubMap(ac)
+	e, err := engine.New(ac)
 	if err != nil {
 		fmt.Printf("Failed to create flogo engine instance: %+v\n", err)
 		os.Exit(1)
@@ -70,5 +76,19 @@ func main() {
 
 	if err := shim.Start(new(Contract)); err != nil {
 		fmt.Printf("Error starting chaincode: %s", err)
+	}
+}
+
+// addChaincodeStubMap sets additional mapping to store chaincode stub in the flow using property name specified by trigger.FabricStub
+func addChaincodeStubMap(ac *app.Config) {
+	for _, tc := range ac.Triggers {
+		if tc.Ref == fabricTrigger {
+			logger.Infof("Add stub mapper to fabric-invoke trigger %+v", tc.Id)
+			for _, hc := range tc.Handlers {
+				ivMap := hc.Action.Mappings.Input
+				mapDef := data.MappingDef{Type: data.MtAssign, Value: "$." + trigger.FabricStub, MapTo: trigger.FabricStub}
+				hc.Action.Mappings.Input = append(ivMap, &mapDef)
+			}
+		}
 	}
 }

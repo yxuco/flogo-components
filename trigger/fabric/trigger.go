@@ -22,7 +22,9 @@ const (
 	oTxID     = "txID"
 	oTxTime   = "txTime"
 	rResult   = "result"
-	cStub     = "chaincode-stub"
+
+	// FabricStub is the name of flow property for passing chaincode stub to activities
+	FabricStub = "chaincode_stub"
 )
 
 // Create a new logger
@@ -124,7 +126,7 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 
 		flowData := make(map[string]interface{})
 		flowData[oData] = data
-		flowData[cStub] = stub
+		flowData[FabricStub] = stub
 		flowData[oTxID] = stub.GetTxID()
 		if ts, err := stub.GetTxTimestamp(); err == nil {
 			flowData[oTxTime] = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC().Format("2006-01-02T15:04:05.000000-0700")

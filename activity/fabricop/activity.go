@@ -3,6 +3,7 @@ package fabricop
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
+	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
 )
 
 // Create a new logger
@@ -36,23 +37,23 @@ func (a *FabActivity) Metadata() *activity.Metadata {
 }
 
 // Eval implements activity.Activity.Eval
-func (a *FabActivity) Eval(context activity.Context) (done bool, err error) {
+func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	// check operation type
-	if op, ok := context.GetSetting(sOperation); ok {
+	if op, ok := ctx.GetSetting(sOperation); ok {
 		logger.Infof("perform operation: %s", op.(string))
 	}
 
 	// check input args
-	key := context.GetInput(ivKey)
+	key := ctx.GetInput(ivKey)
 	logger.Debugf("input key: %s", key)
-	data := context.GetInput(ivData)
+	data := ctx.GetInput(ivData)
 	logger.Debugf("input data: %+v", data)
-	filter := context.GetInput(ivFilter)
+	filter := ctx.GetInput(ivFilter)
 	logger.Debugf("input filter: %+v", filter)
 
 	// get chaincode stub
-	stub, err := GetData(fStub, context)
+	stub, err := GetData("$flow."+fabtrigger.FabricStub, ctx)
 	if err != nil {
 		logger.Errorf("failed to get stub: %+v", err)
 	} else {
@@ -60,7 +61,7 @@ func (a *FabActivity) Eval(context activity.Context) (done bool, err error) {
 	}
 
 	// set output
-	context.SetOutput(ovResult, "done")
+	ctx.SetOutput(ovResult, "done")
 	return true, nil
 }
 
@@ -69,6 +70,7 @@ func (a *FabActivity) Eval(context activity.Context) (done bool, err error) {
 // which is shown in normal flogo mapper as, e.g., "{{$flow.content}}"
 func GetData(toResolve string, context activity.Context) (value interface{}, err error) {
 	actionCtx := context.ActivityHost()
+	logger.Debugf("fabricop context data: %+v", actionCtx.WorkingData())
 	actValue, err := actionCtx.GetResolver().Resolve(toResolve, actionCtx.WorkingData())
 	return actValue, err
 }
