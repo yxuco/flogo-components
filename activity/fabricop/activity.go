@@ -55,7 +55,7 @@ func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 	log.Debugf("input filter: %+v", filter)
 
 	// get chaincode stub
-	stub, err := GetData("$flow.chaincode_stab", ctx)
+	stub, err := GetData(fStub, ctx)
 	if err != nil {
 		log.Errorf("failed to get stub: %+v", err)
 	} else {
