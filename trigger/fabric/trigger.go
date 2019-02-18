@@ -9,10 +9,12 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"time"
+
+	//	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
-	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/TIBCOSoftware/flogo-lib/logger"
+	//	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
 const (
@@ -24,11 +26,12 @@ const (
 	rResult   = "result"
 
 	// FabricStub is the name of flow property for passing chaincode stub to activities
-	FabricStub = "chaincode_stub"
+	FabricStub = "chaincode-stub"
 )
 
 // Create a new logger
-var logger = shim.NewLogger("trigger-fabric-invoke")
+//var logger = shim.NewLogger("trigger-fabric-invoke")
+var log = logger.GetLogger("trigger-fabric-invoke")
 
 // TriggerMap maps 'function' name in trigger handler setting to the trigger,
 // so we can lookup trigger by chaincode function name
@@ -68,17 +71,18 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 	t.handlers = ctx.GetHandlers()
 	for _, handler := range t.handlers {
 		fn := handler.GetStringSetting(sFunction)
-		logger.Info("init function:", fn)
+		log.Info("init function:", fn)
 		_, ok := triggerMap[fn]
 		if ok {
-			logger.Warningf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
+			//			log.Warningf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
+			log.Warnf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
 		}
 		triggerMap[fn] = t
 		args, ok := handler.GetSetting(sArgs)
 		if ok {
-			logger.Infof("init args: %T, %+v", args, args)
+			log.Infof("init args: %T, %+v", args, args)
 		} else {
-			logger.Info("init args not set")
+			log.Info("init args not set")
 		}
 	}
 	return nil
@@ -96,11 +100,13 @@ func (t *Trigger) Start() error {
 
 // Invoke starts the trigger and invokes the action registered in the handler,
 // and returns result as JSON string
-func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []string) (string, error) {
-	logger.Debugf("fabric.Trigger invoke fn %s with args %+v", fn, args)
+//func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []string) (string, error) {
+func (t *Trigger) Invoke(stub interface{}, fn string, args []string) (string, error) {
+	log.Debugf("fabric.Trigger invoke fn %s with args %+v", fn, args)
 	for _, handler := range t.handlers {
 		if f := handler.GetStringSetting(sFunction); f != fn {
-			logger.Warningf("handler function %s is different from requested function %s", f, fn)
+			//			log.Warningf("handler function %s is different from requested function %s", f, fn)
+			log.Warnf("handler function %s is different from requested function %s", f, fn)
 			continue
 		}
 
@@ -118,48 +124,48 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 			return "", fmt.Errorf("failed to prepare trigger data from input %+v", args)
 		}
 
-		if logger.IsEnabledFor(shim.LogDebug) {
-			// debug flow data
-			triggerData, _ := json.Marshal(data)
-			logger.Debugf("trigger output data: %s", string(triggerData))
-		}
+		//		if log.IsEnabledFor(shim.LogDebug) {
+		// debug flow data
+		triggerData, _ := json.Marshal(data)
+		log.Debugf("trigger output data: %s", string(triggerData))
+		//		}
 
 		flowData := make(map[string]interface{})
 		flowData[oData] = data
 		flowData[FabricStub] = stub
-		flowData[oTxID] = stub.GetTxID()
-		if ts, err := stub.GetTxTimestamp(); err == nil {
-			flowData[oTxTime] = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC().Format("2006-01-02T15:04:05.000000-0700")
-		}
+		//		flowData[oTxID] = stub.GetTxID()
+		//		if ts, err := stub.GetTxTimestamp(); err == nil {
+		//			flowData[oTxTime] = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC().Format("2006-01-02T15:04:05.000000-0700")
+		//		}
 
 		// execute flogo flow
-		logger.Debugf("flogo flow started transaction %s with timestamp %s", flowData[oTxID], flowData[oTxTime])
+		log.Debugf("flogo flow started transaction %s with timestamp %s", flowData[oTxID], flowData[oTxTime])
 		results, err := handler.Handle(context.Background(), flowData)
 		if err != nil {
-			logger.Errorf("flogo flow returned error: %+v", err)
+			log.Errorf("flogo flow returned error: %+v", err)
 			return "", err
 		}
 		if len(results) != 0 {
 			if dataAttr, ok := results[rResult]; ok {
 				replyData := dataAttr.Value()
 				if s, ok := replyData.(string); ok {
-					logger.Debugf("flogo flow returned result: %s", s)
+					log.Debugf("flogo flow returned result: %s", s)
 					return s, nil
 				}
-				logger.Infof("flogo flow returned data type %T is not a string: %+v", replyData, replyData)
+				log.Infof("flogo flow returned data type %T is not a string: %+v", replyData, replyData)
 			} else {
-				logger.Infof("flogo flow result does not contain attribute %s", rResult)
+				log.Infof("flogo flow result does not contain attribute %s", rResult)
 			}
 		}
-		logger.Info("flogo flow did not return any data")
+		log.Info("flogo flow did not return any data")
 		return "", nil
 	}
-	logger.Infof("no flogo handler is activated for function %s", fn)
+	log.Infof("no flogo handler is activated for function %s", fn)
 	return "", nil
 }
 
 func prepareFlowData(names, values []string) interface{} {
-	logger.Debugf("prepareFlowData with names %+v values %+v", names, values)
+	log.Debugf("prepareFlowData with names %+v values %+v", names, values)
 	if names == nil || len(names) == 0 {
 		// construct array of objects
 		var result []interface{}
