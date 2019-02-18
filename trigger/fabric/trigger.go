@@ -131,14 +131,17 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 		}
 
 		// execute flogo flow
+		logger.Debugf("flogo flow started transaction %s with timestamp %s", flowData[oTxID], flowData[oTxTime])
 		results, err := handler.Handle(context.Background(), flowData)
 		if err != nil {
+			logger.Errorf("flogo flow returned error: %+v", err)
 			return "", err
 		}
 		if len(results) != 0 {
 			if dataAttr, ok := results[rResult]; ok {
 				replyData := dataAttr.Value()
 				if s, ok := replyData.(string); ok {
+					logger.Debugf("flogo flow returned result: %s", s)
 					return s, nil
 				}
 				logger.Infof("flogo flow returned data type %T is not a string: %+v", replyData, replyData)
