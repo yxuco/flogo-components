@@ -2,12 +2,14 @@ package fabricop
 
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/TIBCOSoftware/flogo-lib/logger"
+	//	"github.com/hyperledger/fabric/core/chaincode/shim"
 	//	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
 )
 
 // Create a new logger
-var logger = shim.NewLogger("activity-tibco-fabricop")
+//var log = shim.NewLogger("activity-tibco-fabricop")
+var log = logger.GetLogger("activity-tibco-fabricop")
 
 const (
 	sOperation = "operation"
@@ -41,23 +43,23 @@ func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 
 	// check operation type
 	if op, ok := ctx.GetSetting(sOperation); ok {
-		logger.Infof("perform operation: %s", op.(string))
+		log.Infof("perform operation: %s", op.(string))
 	}
 
 	// check input args
 	key := ctx.GetInput(ivKey)
-	logger.Debugf("input key: %s", key)
+	log.Debugf("input key: %s", key)
 	data := ctx.GetInput(ivData)
-	logger.Debugf("input data: %+v", data)
+	log.Debugf("input data: %+v", data)
 	filter := ctx.GetInput(ivFilter)
-	logger.Debugf("input filter: %+v", filter)
+	log.Debugf("input filter: %+v", filter)
 
 	// get chaincode stub
 	stub, err := GetData("$flow.chaincode_stab", ctx)
 	if err != nil {
-		logger.Errorf("failed to get stub: %+v", err)
+		log.Errorf("failed to get stub: %+v", err)
 	} else {
-		logger.Infof("fetched stub of type %T: %+v", stub, stub)
+		log.Infof("fetched stub of type %T: %+v", stub, stub)
 	}
 
 	// set output
@@ -70,7 +72,7 @@ func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 // which is shown in normal flogo mapper as, e.g., "{{$flow.content}}"
 func GetData(toResolve string, context activity.Context) (value interface{}, err error) {
 	actionCtx := context.ActivityHost()
-	logger.Debugf("fabricop context data: %+v", actionCtx.WorkingData())
+	log.Debugf("fabricop context data: %+v", actionCtx.WorkingData())
 	actValue, err := actionCtx.GetResolver().Resolve(toResolve, actionCtx.WorkingData())
 	return actValue, err
 }
