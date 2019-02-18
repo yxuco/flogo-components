@@ -3,7 +3,7 @@ package fabricop
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/hyperledger/fabric/core/chaincode/shim"
-	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
+	//	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
 )
 
 // Create a new logger
@@ -53,7 +53,7 @@ func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 	logger.Debugf("input filter: %+v", filter)
 
 	// get chaincode stub
-	stub, err := GetData("$flow."+fabtrigger.FabricStub, ctx)
+	stub, err := GetData("$flow.chaincode_stab", ctx)
 	if err != nil {
 		logger.Errorf("failed to get stub: %+v", err)
 	} else {
