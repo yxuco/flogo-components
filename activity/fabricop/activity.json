@@ -1,0 +1,38 @@
+{
+  "name": "tibco-fabricop",
+  "version": "0.0.1",
+  "type": "flogo:activity",
+  "description": "Fabric Operation Activity",
+  "ref": "github.com/yxuco/flogo-components/activity/fabricop",
+  "title": "Fabric Operation",
+  "homepage": "https://github.com/yxuco/flogo-components/tree/master/activity/fabricop",
+  "author": "Yueming Xu <yxu@tibco.com>",
+  "settings": [
+    {
+      "name": "operation",
+      "type": "string",
+      "required": true,
+      "allowed" : ["GET", "PUT", "DELETE", "SEARCH"]
+    }
+  ],
+  "inputs":[
+    {
+      "name": "key",
+      "type": "string"
+    },
+    {
+      "name": "data",
+      "type": "any"
+    },
+    {
+      "name": "filter",
+      "type": "any"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "result",
+      "type": "any"
+    }
+  ]
+}

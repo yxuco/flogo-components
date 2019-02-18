@@ -26,7 +26,7 @@ const (
 )
 
 // Create a new logger
-var logger = shim.NewLogger("fabric-invoke")
+var logger = shim.NewLogger("trigger-fabric-invoke")
 
 // TriggerMap maps 'function' name in trigger handler setting to the trigger,
 // so we can lookup trigger by chaincode function name

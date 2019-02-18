@@ -4,7 +4,7 @@
   "type": "flogo:trigger",
   "ref": "github.com/yxuco/flogo-components/trigger/fabric",
   "title": "Chaincode Invoke",
-  "description": "Chaincode Transaction Trigger",
+  "description": "Chaincode Invoke Trigger",
   "homepage": "https://github.com/yxuco/flogo-components/tree/master/trigger/fabric",
   "author": "Yumeming Xu <yxu@tibco.com>",
   "settings":[
