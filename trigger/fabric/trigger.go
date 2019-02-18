@@ -105,6 +105,7 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 		// construct trigger data
 		var names []string
 		if argNames, ok := handler.GetSetting(sArgs); ok {
+			logger.Debugf("args setting is type %T: %+v", argNames, argNames)
 			names, ok = argNames.([]string)
 		}
 		data := prepareFlowData(names, args)
@@ -112,9 +113,11 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 			return "", fmt.Errorf("failed to prepare trigger data from input %+v", args)
 		}
 
-		// debug flow data
-		triggerData, _ := json.Marshal(data)
-		logger.Debugf("trigger output data: %s", string(triggerData))
+		if logger.IsEnabledFor(shim.LogDebug) {
+			// debug flow data
+			triggerData, _ := json.Marshal(data)
+			logger.Debugf("trigger output data: %s", string(triggerData))
+		}
 
 		flowData := make(map[string]interface{})
 		flowData[oData] = data
@@ -148,6 +151,7 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 }
 
 func prepareFlowData(names, values []string) interface{} {
+	logger.Debugf("prepareFlowData with names %+v values %+v", names, values)
 	if names == nil || len(names) == 0 {
 		// construct array of objects
 		var result []interface{}
