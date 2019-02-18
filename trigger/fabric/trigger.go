@@ -103,10 +103,13 @@ func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []str
 		}
 
 		// construct trigger data
-		var names []string
+		names := []string{}
 		if argNames, ok := handler.GetSetting(sArgs); ok {
-			logger.Debugf("args setting is type %T: %+v", argNames, argNames)
-			names, ok = argNames.([]string)
+			// assume args setting are simple strings for now
+			// it would be array of schema defs including data type
+			for _, v := range argNames.([]interface{}) {
+				names = append(names, fmt.Sprint(v))
+			}
 		}
 		data := prepareFlowData(names, args)
 		if data == nil {
