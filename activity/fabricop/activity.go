@@ -3,8 +3,9 @@ package fabricop
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
 	"github.com/TIBCOSoftware/flogo-lib/logger"
+
 	//	"github.com/hyperledger/fabric/core/chaincode/shim"
-	//	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
+	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
 )
 
 // Create a new logger
@@ -12,15 +13,11 @@ import (
 var log = logger.GetLogger("activity-tibco-fabricop")
 
 const (
-	sOperation = "operation"
-	ivKey      = "key"
-	ivData     = "data"
-	ivFilter   = "filter"
-	ovResult   = "result"
-
-	fTxID   = "$flow.txID"
-	fTxTime = "$flow.txTime"
-	fStub   = "$flow.chaincode-stub"
+	ivOperation = "operation"
+	ivKey       = "key"
+	ivData      = "data"
+	ivFilter    = "filter"
+	ovResult    = "result"
 )
 
 // FabActivity is used to execute a hyperledger fabric operation
@@ -41,12 +38,14 @@ func (a *FabActivity) Metadata() *activity.Metadata {
 // Eval implements activity.Activity.Eval
 func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 
-	// check operation type
-	if op, ok := ctx.GetSetting(sOperation); ok {
-		log.Infof("perform operation: %s", op.(string))
-	}
+	// check operation type, UI cannot config settings, so use input args
+	//if op, ok := ctx.GetSetting(sOperation); ok {
+	//	log.Infof("perform operation: %s", op.(string))
+	//}
 
 	// check input args
+	op := ctx.GetInput(ivOperation)
+	log.Debugf("perform operation: %s", op)
 	key := ctx.GetInput(ivKey)
 	log.Debugf("input key: %s", key)
 	data := ctx.GetInput(ivData)
@@ -55,7 +54,7 @@ func (a *FabActivity) Eval(ctx activity.Context) (done bool, err error) {
 	log.Debugf("input filter: %+v", filter)
 
 	// get chaincode stub
-	stub, err := GetData(fStub, ctx)
+	stub, err := GetData("$flow."+fabtrigger.FabricStub, ctx)
 	if err != nil {
 		log.Errorf("failed to get stub: %+v", err)
 	} else {

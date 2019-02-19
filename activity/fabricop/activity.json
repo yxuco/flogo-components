@@ -8,14 +8,14 @@
   "homepage": "https://github.com/yxuco/flogo-components/tree/master/activity/fabricop",
   "author": "Yueming Xu <yxu@tibco.com>",
   "settings": [
+  ],
+  "inputs":[
     {
       "name": "operation",
       "type": "string",
       "required": true,
       "allowed" : ["GET", "PUT", "DELETE", "SEARCH"]
-    }
-  ],
-  "inputs":[
+    },
     {
       "name": "key",
       "type": "string"
