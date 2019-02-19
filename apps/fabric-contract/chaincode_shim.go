@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -50,6 +51,8 @@ var (
 
 // main function starts up the chaincode in the container during instantiate
 func main() {
+	logger.SetLevel(shim.LogDebug)
+
 	// configure flogo engine
 	if cp == nil {
 		// Use default config provider
@@ -62,7 +65,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	addChaincodeStubMap(ac)
+	inputAssignMap(ac, fabricTrigger, trigger.FabricStub)
 	e, err := engine.New(ac)
 	if err != nil {
 		fmt.Printf("Failed to create flogo engine instance: %+v\n", err)
@@ -79,15 +82,42 @@ func main() {
 	}
 }
 
-// addChaincodeStubMap sets additional mapping to store chaincode stub in the flow using property name specified by trigger.FabricStub
-func addChaincodeStubMap(ac *app.Config) {
+// inputAssignMap sets additional input mapping for a specified trigger ref type
+func inputAssignMap(ac *app.Config, triggerRef, name string) {
+	// add the name to all flow resources
+	prop := map[string]interface{}{"name": name, "type": "any"}
+	for _, rc := range ac.Resources {
+		var jsonobj map[string]interface{}
+		if err := json.Unmarshal(rc.Data, &jsonobj); err != nil {
+			logger.Errorf("failed to parse resource data %s: %+v", rc.ID, err)
+			continue
+		}
+		if metadata, ok := jsonobj["metadata"]; ok {
+			metaMap := metadata.(map[string]interface{})
+			if input, ok := metaMap["input"]; ok {
+				inputArray := input.([]interface{})
+				logger.Debugf("add new property %s to resource input for %s", name, rc.ID)
+				metaMap["input"] = append(inputArray, prop)
+				if jsonbytes, err := json.Marshal(jsonobj); err == nil {
+					logger.Debugf("resource data is updated for %s: %s", rc.ID, string(jsonbytes))
+					rc.Data = jsonbytes
+				} else {
+					logger.Debugf("failed to serialize resource %s: %+v", rc.ID, err)
+				}
+			}
+		}
+	}
+	// add input mapper
 	for _, tc := range ac.Triggers {
-		if tc.Ref == fabricTrigger {
-			logger.Infof("Add stub mapper to fabric-invoke trigger %+v", tc.Id)
+		if tc.Ref == triggerRef {
+			logger.Infof("Add input mapper for %s to trigger %+v", name, tc.Id)
 			for _, hc := range tc.Handlers {
 				ivMap := hc.Action.Mappings.Input
-				mapDef := data.MappingDef{Type: data.MtAssign, Value: "$." + trigger.FabricStub, MapTo: trigger.FabricStub}
+				mapDef := data.MappingDef{Type: data.MtAssign, Value: "$." + name, MapTo: name}
 				hc.Action.Mappings.Input = append(ivMap, &mapDef)
+				for _, def := range hc.Action.Mappings.Input {
+					logger.Debugf("def Mapto %s, type %s, value %T: %+v", def.MapTo, def.Type, def.Value, def.Value)
+				}
 			}
 		}
 	}

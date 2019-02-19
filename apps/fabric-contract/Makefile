@@ -23,6 +23,7 @@ create: $(APP_FILE) clean
 
 .PHONY: build
 build: $(APP_NAME)
+	cp chaincode_shim.go $(APP_NAME)/src/$(APP_NAME) && \
 	cd $(APP_NAME) && \
 	env GOOS=linux GOARCH=amd64 flogo build -e
 

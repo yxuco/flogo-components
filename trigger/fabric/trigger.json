@@ -21,7 +21,11 @@
     {
       "name": "txTime",
       "type": "string"
-    }  
+    },
+    {
+      "name": "chaincode-stub",
+      "type": "any"
+    }
   ],
   "reply": [
     {
