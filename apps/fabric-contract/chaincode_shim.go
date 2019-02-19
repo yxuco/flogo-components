@@ -82,7 +82,8 @@ func main() {
 	}
 }
 
-// inputAssignMap sets additional input mapping for a specified trigger ref type
+// inputAssignMap sets additional input mapping for a specified trigger ref type;
+// this is to ensure the mapping of a trigger output property to avoid user error.
 func inputAssignMap(ac *app.Config, triggerRef, name string) {
 	// add the name to all flow resources
 	prop := map[string]interface{}{"name": name, "type": "any"}
@@ -96,13 +97,23 @@ func inputAssignMap(ac *app.Config, triggerRef, name string) {
 			metaMap := metadata.(map[string]interface{})
 			if input, ok := metaMap["input"]; ok {
 				inputArray := input.([]interface{})
-				logger.Debugf("add new property %s to resource input for %s", name, rc.ID)
-				metaMap["input"] = append(inputArray, prop)
-				if jsonbytes, err := json.Marshal(jsonobj); err == nil {
-					logger.Debugf("resource data is updated for %s: %s", rc.ID, string(jsonbytes))
-					rc.Data = jsonbytes
-				} else {
-					logger.Debugf("failed to serialize resource %s: %+v", rc.ID, err)
+				done := false
+				for _, ip := range inputArray {
+					ipMap := ip.(map[string]interface{})
+					if ipMap["name"].(string) == name {
+						done = true
+						continue
+					}
+				}
+				if !done {
+					logger.Debugf("add new property %s to resource input of %s", name, rc.ID)
+					metaMap["input"] = append(inputArray, prop)
+					if jsonbytes, err := json.Marshal(jsonobj); err == nil {
+						logger.Debugf("resource data is updated for %s: %s", rc.ID, string(jsonbytes))
+						rc.Data = jsonbytes
+					} else {
+						logger.Debugf("failed to serialize resource %s: %+v", rc.ID, err)
+					}
 				}
 			}
 		}
@@ -110,13 +121,19 @@ func inputAssignMap(ac *app.Config, triggerRef, name string) {
 	// add input mapper
 	for _, tc := range ac.Triggers {
 		if tc.Ref == triggerRef {
-			logger.Infof("Add input mapper for %s to trigger %+v", name, tc.Id)
 			for _, hc := range tc.Handlers {
 				ivMap := hc.Action.Mappings.Input
-				mapDef := data.MappingDef{Type: data.MtAssign, Value: "$." + name, MapTo: name}
-				hc.Action.Mappings.Input = append(ivMap, &mapDef)
-				for _, def := range hc.Action.Mappings.Input {
-					logger.Debugf("def Mapto %s, type %s, value %T: %+v", def.MapTo, def.Type, def.Value, def.Value)
+				done := false
+				for _, def := range ivMap {
+					if def.MapTo == name {
+						done = true
+						continue
+					}
+				}
+				if !done {
+					logger.Infof("Add input mapper for %s to trigger %+v", name, tc.Id)
+					mapDef := data.MappingDef{Type: data.MtAssign, Value: "$." + name, MapTo: name}
+					hc.Action.Mappings.Input = append(ivMap, &mapDef)
 				}
 			}
 		}

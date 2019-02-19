@@ -20,9 +20,9 @@
             "mappings": {
               "input": [
                 {
-                  "mapTo": "data",
+                  "mapTo": "txTime",
                   "type": "assign",
-                  "value": "$.data"
+                  "value": "$.txTime"
                 },
                 {
                   "mapTo": "txID",
@@ -30,9 +30,14 @@
                   "value": "$.txID"
                 },
                 {
-                  "mapTo": "txTime",
+                  "mapTo": "data",
                   "type": "assign",
-                  "value": "$.txTime"
+                  "value": "$.data"
+                },
+                {
+                  "mapTo": "_chaincode_stub",
+                  "type": "assign",
+                  "value": "$._chaincode_stub"
                 }
               ],
               "output": [
@@ -115,7 +120,7 @@
           "input": [
             {
               "name": "data",
-              "type": "object"
+              "type": "any"
             },
             {
               "name": "txID",
@@ -124,6 +129,10 @@
             {
               "name": "txTime",
               "type": "string"
+            },
+            {
+              "name": "_chaincode_stub",
+              "type": "any"
             }
           ],
           "output": [
@@ -258,7 +267,7 @@
           "input": [
             {
               "name": "data",
-              "type": "object"
+              "type": "any"
             },
             {
               "name": "txID",
