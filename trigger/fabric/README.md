@@ -15,9 +15,17 @@ docker exec -it $(docker ps | grep "flogo/flogo-docker" | awk '{print $1}') bash
 apk add --no-cache musl-dev
 cd /tmp/flogo-web/build/server/local/engines/flogo-web/src/flogo-web
 rm -Rf Gopkg.* vendor
+```
+Edit the file `imports.go` to add the following line to force dependency on `hyperledger fabric shim`:
+```
+    _ "github.com/hyperledger/fabric/core/chaincode/shim"
+```
+Rebuild the `flogo-web`, and exit the docker container:
+```
 export GOPATH=/tmp/flogo-web/build/server/local/engines/flogo-web
 dep init
 go build -o ../../bin/flogo-web
+exit
 ```
 Finally, you can save the image for later use from another terminal, i.e.,
 ```

@@ -23,7 +23,7 @@
       "type": "string"
     },
     {
-      "name": "chaincode-stub",
+      "name": "_chaincode_stub",
       "type": "any"
     }
   ],

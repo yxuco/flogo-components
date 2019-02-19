@@ -26,7 +26,7 @@ const (
 	rResult   = "result"
 
 	// FabricStub is the name of flow property for passing chaincode stub to activities
-	FabricStub = "chaincode-stub"
+	FabricStub = "_chaincode_stub"
 )
 
 // Create a new logger
