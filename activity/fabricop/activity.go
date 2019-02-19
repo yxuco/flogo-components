@@ -2,15 +2,16 @@ package fabricop
 
 import (
 	"github.com/TIBCOSoftware/flogo-lib/core/activity"
-	"github.com/TIBCOSoftware/flogo-lib/logger"
+	//	"github.com/TIBCOSoftware/flogo-lib/logger"
 
-	//	"github.com/hyperledger/fabric/core/chaincode/shim"
+	"github.com/hyperledger/fabric/core/chaincode/shim"
 	fabtrigger "github.com/yxuco/flogo-components/trigger/fabric"
 )
 
 // Create a new logger
-//var log = shim.NewLogger("activity-tibco-fabricop")
-var log = logger.GetLogger("activity-tibco-fabricop")
+var log = shim.NewLogger("activity-tibco-fabricop")
+
+//var log = logger.GetLogger("activity-tibco-fabricop")
 
 const (
 	ivOperation = "operation"

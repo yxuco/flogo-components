@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	//	"time"
+	"time"
 
 	"github.com/TIBCOSoftware/flogo-lib/core/trigger"
-	"github.com/TIBCOSoftware/flogo-lib/logger"
-	//	"github.com/hyperledger/fabric/core/chaincode/shim"
+	//	"github.com/TIBCOSoftware/flogo-lib/logger"
+	"github.com/hyperledger/fabric/core/chaincode/shim"
 )
 
 const (
@@ -30,8 +30,9 @@ const (
 )
 
 // Create a new logger
-//var logger = shim.NewLogger("trigger-fabric-invoke")
-var log = logger.GetLogger("trigger-fabric-invoke")
+var log = shim.NewLogger("trigger-fabric-invoke")
+
+//var log = logger.GetLogger("trigger-fabric-invoke")
 
 // TriggerMap maps 'function' name in trigger handler setting to the trigger,
 // so we can lookup trigger by chaincode function name
@@ -74,8 +75,8 @@ func (t *Trigger) Initialize(ctx trigger.InitContext) error {
 		log.Info("init function:", fn)
 		_, ok := triggerMap[fn]
 		if ok {
-			//			log.Warningf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
-			log.Warnf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
+			log.Warningf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
+			//log.Warnf("function %s used by multiple trigger handlers, only the last handler is effective", fn)
 		}
 		triggerMap[fn] = t
 		args, ok := handler.GetSetting(sArgs)
@@ -100,13 +101,13 @@ func (t *Trigger) Start() error {
 
 // Invoke starts the trigger and invokes the action registered in the handler,
 // and returns result as JSON string
-//func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []string) (string, error) {
-func (t *Trigger) Invoke(stub interface{}, fn string, args []string) (string, error) {
+func (t *Trigger) Invoke(stub shim.ChaincodeStubInterface, fn string, args []string) (string, error) {
+	//func (t *Trigger) Invoke(stub interface{}, fn string, args []string) (string, error) {
 	log.Debugf("fabric.Trigger invoke fn %s with args %+v", fn, args)
 	for _, handler := range t.handlers {
 		if f := handler.GetStringSetting(sFunction); f != fn {
-			//			log.Warningf("handler function %s is different from requested function %s", f, fn)
-			log.Warnf("handler function %s is different from requested function %s", f, fn)
+			log.Warningf("handler function %s is different from requested function %s", f, fn)
+			//log.Warnf("handler function %s is different from requested function %s", f, fn)
 			continue
 		}
 
@@ -124,19 +125,19 @@ func (t *Trigger) Invoke(stub interface{}, fn string, args []string) (string, er
 			return "", fmt.Errorf("failed to prepare trigger data from input %+v", args)
 		}
 
-		//		if log.IsEnabledFor(shim.LogDebug) {
-		// debug flow data
-		triggerData, _ := json.Marshal(data)
-		log.Debugf("trigger output data: %s", string(triggerData))
-		//		}
+		if log.IsEnabledFor(shim.LogDebug) {
+			// debug flow data
+			triggerData, _ := json.Marshal(data)
+			log.Debugf("trigger output data: %s", string(triggerData))
+		}
 
 		flowData := make(map[string]interface{})
 		flowData[oData] = data
 		flowData[FabricStub] = stub
-		//		flowData[oTxID] = stub.GetTxID()
-		//		if ts, err := stub.GetTxTimestamp(); err == nil {
-		//			flowData[oTxTime] = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC().Format("2006-01-02T15:04:05.000000-0700")
-		//		}
+		flowData[oTxID] = stub.GetTxID()
+		if ts, err := stub.GetTxTimestamp(); err == nil {
+			flowData[oTxTime] = time.Unix(ts.Seconds, int64(ts.Nanos)).UTC().Format("2006-01-02T15:04:05.000000-0700")
+		}
 
 		// execute flogo flow
 		log.Debugf("flogo flow started transaction %s with timestamp %s", flowData[oTxID], flowData[oTxTime])

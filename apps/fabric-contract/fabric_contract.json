@@ -1,0 +1,352 @@
+{
+  "name": "Fabric Contract",
+  "type": "flogo:app",
+  "version": "0.0.1",
+  "appModel": "1.0.0",
+  "triggers": [
+    {
+      "id": "invoke_put",
+      "ref": "github.com/yxuco/flogo-components/trigger/fabric",
+      "name": "Invoke PUT",
+      "description": "Chaincode Invoke Trigger",
+      "settings": {},
+      "handlers": [
+        {
+          "action": {
+            "ref": "github.com/TIBCOSoftware/flogo-contrib/action/flow",
+            "data": {
+              "flowURI": "res://flow:put_record"
+            },
+            "mappings": {
+              "input": [
+                {
+                  "mapTo": "data",
+                  "type": "assign",
+                  "value": "$.data"
+                },
+                {
+                  "mapTo": "txID",
+                  "type": "assign",
+                  "value": "$.txID"
+                },
+                {
+                  "mapTo": "txTime",
+                  "type": "assign",
+                  "value": "$.txTime"
+                }
+              ],
+              "output": [
+                {
+                  "mapTo": "result",
+                  "type": "assign",
+                  "value": "$.result"
+                }
+              ]
+            }
+          },
+          "settings": {
+            "function": "put_record",
+            "args": [
+              "user_txn_id",
+              "data",
+              "hash_type",
+              "hash_value"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "invoke_get",
+      "ref": "github.com/yxuco/flogo-components/trigger/fabric",
+      "name": "Invoke GET",
+      "description": "Chaincode Invoke Trigger",
+      "settings": {},
+      "handlers": [
+        {
+          "action": {
+            "ref": "github.com/TIBCOSoftware/flogo-contrib/action/flow",
+            "data": {
+              "flowURI": "res://flow:get_record"
+            },
+            "mappings": {
+              "input": [
+                {
+                  "mapTo": "data",
+                  "type": "assign",
+                  "value": "$.data"
+                },
+                {
+                  "mapTo": "txID",
+                  "type": "assign",
+                  "value": "$.txID"
+                },
+                {
+                  "mapTo": "txTime",
+                  "type": "assign",
+                  "value": "$.txTime"
+                }
+              ],
+              "output": [
+                {
+                  "mapTo": "result",
+                  "type": "assign",
+                  "value": "$.result"
+                }
+              ]
+            }
+          },
+          "settings": {
+            "function": "get_record",
+            "args": [
+              "key"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "id": "flow:put_record",
+      "data": {
+        "name": "Put Record",
+        "metadata": {
+          "input": [
+            {
+              "name": "data",
+              "type": "object"
+            },
+            {
+              "name": "txID",
+              "type": "string"
+            },
+            {
+              "name": "txTime",
+              "type": "string"
+            }
+          ],
+          "output": [
+            {
+              "name": "result",
+              "type": "string"
+            }
+          ]
+        },
+        "tasks": [
+          {
+            "id": "log_2",
+            "name": "Log TxID",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "expression",
+                    "value": "string.concat(\"txID\", $flow.txID, \"txTime\", $flow.txTime)",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "jsmapper_3",
+            "name": "Map User TxID",
+            "description": "JSONata Mapper Activity",
+            "activity": {
+              "ref": "github.com/yxuco/flogo-components/activity/jsmapper",
+              "input": {
+                "mapexpr": "{{$flow.data}}.user_txn_id"
+              }
+            }
+          },
+          {
+            "id": "log_4",
+            "name": "Log Map Result",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "expression",
+                    "value": "string.concat(\"jsmapper output:\",$activity[jsmapper_3].value)",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "fabricop_5",
+            "name": "Put Record",
+            "description": "Fabric Operation Activity",
+            "activity": {
+              "ref": "github.com/yxuco/flogo-components/activity/fabricop",
+              "input": {
+                "operation": "PUT"
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "$flow.txID",
+                    "mapTo": "key"
+                  },
+                  {
+                    "type": "assign",
+                    "value": "$flow.data",
+                    "mapTo": "data"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "actreturn_6",
+            "name": "Return",
+            "description": "Simple Return Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/actreturn",
+              "input": {
+                "mappings": [
+                  {
+                    "mapTo": "result",
+                    "type": "assign",
+                    "value": "$activity[log_2].message"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "links": [
+          {
+            "from": "log_2",
+            "to": "jsmapper_3"
+          },
+          {
+            "from": "jsmapper_3",
+            "to": "log_4"
+          },
+          {
+            "from": "log_4",
+            "to": "fabricop_5"
+          },
+          {
+            "from": "fabricop_5",
+            "to": "actreturn_6"
+          }
+        ]
+      }
+    },
+    {
+      "id": "flow:get_record",
+      "data": {
+        "name": "Get Record",
+        "metadata": {
+          "input": [
+            {
+              "name": "data",
+              "type": "object"
+            },
+            {
+              "name": "txID",
+              "type": "string"
+            },
+            {
+              "name": "txTime",
+              "type": "string"
+            }
+          ],
+          "output": [
+            {
+              "name": "result",
+              "type": "string"
+            }
+          ]
+        },
+        "tasks": [
+          {
+            "id": "log_2",
+            "name": "Log Request",
+            "description": "Simple Log Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/log",
+              "input": {
+                "flowInfo": false,
+                "addToFlow": true
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "expression",
+                    "value": "string.concat(\"Received get key:\", $flow.data.key)",
+                    "mapTo": "message"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "fabricop_3",
+            "name": "Get Record",
+            "description": "Fabric Operation Activity",
+            "activity": {
+              "ref": "github.com/yxuco/flogo-components/activity/fabricop",
+              "input": {
+                "operation": "GET"
+              },
+              "mappings": {
+                "input": [
+                  {
+                    "type": "assign",
+                    "value": "$flow.data.key",
+                    "mapTo": "key"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "id": "actreturn_4",
+            "name": "Return",
+            "description": "Simple Return Activity",
+            "activity": {
+              "ref": "github.com/TIBCOSoftware/flogo-contrib/activity/actreturn",
+              "input": {
+                "mappings": [
+                  {
+                    "mapTo": "result",
+                    "type": "assign",
+                    "value": "$activity[fabricop_3].result"
+                  }
+                ]
+              }
+            }
+          }
+        ],
+        "links": [
+          {
+            "from": "log_2",
+            "to": "fabricop_3"
+          },
+          {
+            "from": "fabricop_3",
+            "to": "actreturn_4"
+          }
+        ]
+      }
+    }
+  ]
+}
